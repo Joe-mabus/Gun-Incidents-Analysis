@@ -15,6 +15,22 @@ class Dataset:
         self.header = data[0]
         self.data = data[1:]
 
+    def counts_unique(index, list):
+        things = [row[index] for row in list]
+
+        dictionary = {}
+
+        for each in things:
+            if each in dictionary:
+                dictionary[each] += 1
+            else:
+                dictionary[each] = 1
+        return dictionary
+
+    def list_comprehension(index, list):
+        things = [row[index] for row in list]
+        return things
+
 
 incidents_dataset = Dataset(incidents)
 
@@ -26,15 +42,13 @@ census_dataset = Dataset(census)
 census_headers = census_dataset.header
 census_data = census_dataset.data
 
-years = [row[1] for row in incidents_data]
+year_counts = Dataset.counts_unique(1, incidents_data)
+sex_count = Dataset.counts_unique(5, incidents_data)
+race_counts = Dataset.counts_unique(7, incidents_data)
+intent_counts = Dataset.counts_unique(3, incidents_data)
 
-year_counts = {}
-
-for each in years:
-    if each in year_counts:
-        year_counts[each] += 1
-    else:
-        year_counts[each] = 1
+races = Dataset.list_comprehension(7, incidents_data)
+intents = Dataset.list_comprehension(3, incidents_data)
 
 dates = []
 
@@ -48,36 +62,6 @@ for date in dates:
         date_counts[date] += 1
     else:
         date_counts[date] = 1
-
-sex = [row[5] for row in incidents_data]
-
-sex_count = {}
-
-for each in sex:
-    if each in sex_count:
-        sex_count[each] += 1
-    else:
-        sex_count[each] = 1
-
-races = [row[7] for row in incidents_data]
-
-race_counts = {}
-
-for each in races:
-    if each in race_counts:
-        race_counts[each] += 1
-    else:
-        race_counts[each] = 1
-
-intents = [row[3] for row in incidents_data]
-
-intent_counts = {}
-
-for each in intents:
-    if each in intent_counts:
-        intent_counts[each] += 1
-    else:
-        intent_counts[each] = 1
 
 mapping = {}
 
@@ -110,4 +94,4 @@ homicide_race_counts_perhundredk = {}
 for k, v in homicide_race_counts.items():
     homicide_race_counts_perhundredk[k] = (v / mapping[k]) * 100000
 
-print(homicide_race_counts_perhundredk)
+print(intent_counts)
