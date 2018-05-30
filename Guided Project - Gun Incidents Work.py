@@ -31,6 +31,17 @@ class Dataset:
         things = [row[index] for row in list]
         return things
 
+    def onehundredk_calc(counting, legend):
+        dictionary = {}
+
+        for k, v in counting.items():
+            dictionary[k] = (v / legend[k]) * 100000
+        return dictionary
+
+
+homicide_race_counts = {}
+
+homicide_race_counts = {}
 
 incidents_dataset = Dataset(incidents)
 
@@ -52,7 +63,6 @@ intents = Dataset.list_comprehension(3, incidents_data)
 
 dates = []
 
-
 dates = [datetime.datetime(year=int(row[1]), month=int(row[2]), day=1) for row in incidents_data]
 
 date_counts = {}
@@ -71,11 +81,7 @@ mapping["Native American/Native Alaskan"] = int(census[1][13])
 mapping["Hispanic"] = int(census[1][11])
 mapping["White"] = int(census[1][10])
 
-race_per_hundredk = {}
-
-
-for k, v in race_counts.items():
-    race_per_hundredk[k] = (v / mapping[k]) * 100000
+race_per_hundredk = Dataset.onehundredk_calc(race_counts, mapping)
 
 homicide_race_counts = {}
 
@@ -87,11 +93,11 @@ for i, race in enumerate(races):
         else:
             homicide_race_counts[race] = 0
 
+homicide_race_counts_perhundredk = Dataset.onehundredk_calc(homicide_race_counts, mapping)
 
-homicide_race_counts_perhundredk = {}
 
-
-for k, v in homicide_race_counts.items():
-    homicide_race_counts_perhundredk[k] = (v / mapping[k]) * 100000
+# for k, v in homicide_race_counts.items():
+#     homicide_race_counts_perhundredk[k] = (v / mapping[k]) * 100000
 
 print(intent_counts)
+print(homicide_race_counts_perhundredk)
