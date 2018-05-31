@@ -31,17 +31,32 @@ class Dataset:
         things = [row[index] for row in list]
         return things
 
-    def onehundredk_calc(counting, legend):
+    def onehundredk_calc(list, legend):
         dictionary = {}
 
-        for k, v in counting.items():
+        for k, v in list.items():
             dictionary[k] = (v / legend[k]) * 100000
         return dictionary
 
+    def slicing_counts_unique(demographic, funnel, search_term):
+        dictionary = {}
 
-homicide_race_counts = {}
+        for i, each in enumerate(demographic):
+            if funnel[i] == search_term:
+                if each in dictionary:
+                    dictionary[each] += 1
+                else:
+                    dictionary[each] = 0
+        return dictionary
 
-homicide_race_counts = {}
+# is_number doesn't work yet.
+#     def is_number(point):
+#         try:
+#             float(point)
+#             return True
+#         except ValueError:
+#             return False
+
 
 incidents_dataset = Dataset(incidents)
 
@@ -54,11 +69,12 @@ census_headers = census_dataset.header
 census_data = census_dataset.data
 
 year_counts = Dataset.counts_unique(1, incidents_data)
-sex_count = Dataset.counts_unique(5, incidents_data)
+gender_counts = Dataset.counts_unique(5, incidents_data)
 race_counts = Dataset.counts_unique(7, incidents_data)
 intent_counts = Dataset.counts_unique(3, incidents_data)
 
 races = Dataset.list_comprehension(7, incidents_data)
+gender = Dataset.list_comprehension(5, incidents_data)
 intents = Dataset.list_comprehension(3, incidents_data)
 
 dates = []
@@ -73,31 +89,35 @@ for date in dates:
     else:
         date_counts[date] = 1
 
-mapping = {}
 
-mapping["Asian/Pacific Islander"] = int(census[1][14]) + int(census[1][15])
-mapping["Black"] = int(census[1][12])
-mapping["Native American/Native Alaskan"] = int(census[1][13])
-mapping["Hispanic"] = int(census[1][11])
-mapping["White"] = int(census[1][10])
+# want to take all the int() functions out of this and convert all to numbers
+race_mapping = {}
 
-race_per_hundredk = Dataset.onehundredk_calc(race_counts, mapping)
+race_mapping["Asian/Pacific Islander"] = int(census[1][14]) + int(census[1][15])
+race_mapping["Black"] = int(census[1][12])
+race_mapping["Native American/Native Alaskan"] = int(census[1][13])
+race_mapping["Hispanic"] = int(census[1][11])
+race_mapping["White"] = int(census[1][10])
 
-homicide_race_counts = {}
+# also want to determine numbers by male and female.
+
+homicide_gender_counts = Dataset.slicing_counts_unique(gender, intents, 'Homicide')
+
+# homicide_gender_counts_perhundredk = Dataset.onehundredk_calc(homicide_gender_counts, race_mapping)
+
+incident_counts_M = Dataset.slicing_counts_unique(intents, gender, 'M')
+
+incident_counts_F = Dataset.slicing_counts_unique(intents, gender, 'F')
+
+race_per_hundredk = Dataset.onehundredk_calc(race_counts, race_mapping)
+
+homicide_race_counts = Dataset.slicing_counts_unique(races, intents, 'Homicide')
+
+homicide_race_counts_perhundredk = Dataset.onehundredk_calc(homicide_race_counts, race_mapping)
 
 
-for i, race in enumerate(races):
-    if intents[i] == "Homicide":
-        if race in homicide_race_counts:
-            homicide_race_counts[race] += 1
-        else:
-            homicide_race_counts[race] = 0
-
-homicide_race_counts_perhundredk = Dataset.onehundredk_calc(homicide_race_counts, mapping)
-
-
-# for k, v in homicide_race_counts.items():
-#     homicide_race_counts_perhundredk[k] = (v / mapping[k]) * 100000
-
-print(intent_counts)
-print(homicide_race_counts_perhundredk)
+# print(race_per_hundredk)
+print(incident_counts_M)
+print(incident_counts_F)
+# print(homicide_gender_counts_perhundredk)
+# print(homicide_race_counts_perhundredk)
